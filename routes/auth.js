@@ -24,17 +24,17 @@ authRoutes.get("/signup", (req, res, next) => {
 });
 
 authRoutes.post("/signup", (req, res, next) => {
-  const username = req.body.username;
+  const email = req.body.email;
   const password = req.body.password;
   const rol = req.body.role;
-  if (username === "" || password === "") {
-    res.render("auth/signup", { message: "Indicate username and password" });
+  if (email === "" || password === "") {
+    res.render("auth/signup", { message: "Indicate email and password" });
     return;
   }
 
-  User.findOne({ username }, "username", (err, user) => {
+  User.findOne({ email }, "email", (err, user) => {
     if (user !== null) {
-      res.render("auth/signup", { message: "The username already exists" });
+      res.render("auth/signup", { message: "The email already exists" });
       return;
     }
 
@@ -42,14 +42,15 @@ authRoutes.post("/signup", (req, res, next) => {
     const hashPass = bcrypt.hashSync(password, salt);
 
     const newUser = new User({
-      username,
+      email,
       password: hashPass,
       role:"teacher"
     });
 
     newUser.save((err) => {
+      console.log('DEBUG err', err);
       if (err) {
-        res.render("auth/signup", { message: "Something went wrong" });
+        res.render("auth/signup", { message: "Something went wrong" + err });
       } else {
         res.redirect("/");
       }
